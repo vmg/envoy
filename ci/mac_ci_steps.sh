@@ -30,6 +30,6 @@ else
 fi
 
 if [[ "$TEST_TARGETS" == "//test/..." ]]; then
-  bazel build ${BAZEL_BUILD_OPTIONS} //source/exe:envoy-static
+  bazel ${BAZEL_STARTUP_OPTIONS} build ${BAZEL_BUILD_OPTIONS} //source/exe:envoy-static
 fi
-bazel test ${BAZEL_BUILD_OPTIONS} ${TEST_TARGETS}
+bazel ${BAZEL_STARTUP_OPTIONS} test ${BAZEL_BUILD_OPTIONS} ${TEST_TARGETS}

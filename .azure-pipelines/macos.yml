@@ -11,8 +11,8 @@ jobs:
   steps:
   - task: CacheBeta@0
     inputs:
-      key: .bazelversion | $(Agent.OS) | ci/mac_ci_setup.sh
-      path: /usr/local
+      key: .bazelversion | $(Agent.OS)
+      path: $(Pipelines.Workspace)/bazel-out
       cacheHitVar: SKIP_SETUP
 
   - script: ./ci/mac_ci_setup.sh
@@ -22,6 +22,7 @@ jobs:
   - script: ./ci/mac_ci_steps.sh
     displayName: 'Run Mac CI'
     env:
+      BAZEL_STARTUP_OPTIONS: --output_base=$(Pipelines.Workspace)/bazel-out
       BAZEL_REMOTE_CACHE: grpcs://remotebuildexecution.googleapis.com
       BAZEL_REMOTE_INSTANCE: projects/envoy-ci/instances/default_instance
       GCP_SERVICE_ACCOUNT_KEY: $(GcpServiceAccountKey)
