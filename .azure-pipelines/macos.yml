@@ -9,8 +9,14 @@ jobs:
     vmImage: 'macos-latest'
 
   steps:
+  - cache:
+    key: .bazelversion | $(Agent.OS) | ci/mac_ci_setup.sh
+    path: /usr/local
+    cacheHitVar: SKIP_SETUP
+
   - script: ./ci/mac_ci_setup.sh
     displayName: 'Install dependencies'
+    condition: ne(variables.SKIP_SETUP, 'true')
 
   - script: ./ci/mac_ci_steps.sh
     displayName: 'Run Mac CI'
