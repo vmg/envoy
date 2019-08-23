@@ -9,7 +9,7 @@ jobs:
     vmImage: 'macos-latest'
 
   steps:
-  - task: CacheBeta@1
+  - task: CacheBeta@0
     inputs:
       key: .bazelversion | $(Agent.OS) | ci/mac_ci_setup.sh
       path: /usr/local
