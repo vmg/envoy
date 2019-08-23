@@ -17,6 +17,7 @@ jobs:
         .bazelversion | $(Agent.OS) | "$(System.PullRequest.TargetBranch)"
         .bazelversion | $(Agent.OS) | "refs/heads/master"
       path: $(Pipelines.Workspace)/bazel-out
+    continueOnError: true
 
   - script: ./ci/mac_ci_setup.sh
     displayName: 'Install dependencies'
