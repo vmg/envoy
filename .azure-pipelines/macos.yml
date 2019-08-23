@@ -13,7 +13,7 @@ jobs:
 
   - task: CacheBeta@0
     inputs:
-      key: .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)" | $(Build.BuildNumber)
+      key: .bazelversion | "$(Agent.OS)" | "$(Build.SourceBranch)" | "$(Build.BuildNumber)"
       restoreKeys:
         .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)"
         .bazelversion | $(Agent.OS) | "$(System.PullRequest.TargetBranch)"
