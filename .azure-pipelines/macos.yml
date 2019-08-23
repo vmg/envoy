@@ -9,6 +9,8 @@ jobs:
     vmImage: 'macos-latest'
 
   steps:
+  - bash: mkdir $(Pipeline.Workspace)/bazel-out
+
   - task: CacheBeta@0
     inputs:
       key: .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)" | $(Build.BuildNumber)
