@@ -11,11 +11,11 @@ jobs:
   steps:
   - task: CacheBeta@0
     inputs:
-      key: .bazelversion | $(Agent.OS) | $(Build.SourceBranch) | $(Build.BuildNumber)
+      key: .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)" | $(Build.BuildNumber)
       restoreKeys:
-        .bazelversion | $(Agent.OS) | $(Build.SourceBranch)
-        .bazelversion | $(Agent.OS) | $(System.PullRequest.TargetBranch)
-        .bazelversion | $(Agent.OS) | refs/heads/master
+        .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)"
+        .bazelversion | $(Agent.OS) | "$(System.PullRequest.TargetBranch)"
+        .bazelversion | $(Agent.OS) | "refs/heads/master"
       path: $(Pipelines.Workspace)/bazel-out
 
   - script: ./ci/mac_ci_setup.sh
