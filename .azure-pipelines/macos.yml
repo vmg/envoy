@@ -16,7 +16,7 @@ jobs:
         .bazelversion | $(Agent.OS) | "$(Build.SourceBranch)"
         .bazelversion | $(Agent.OS) | "$(System.PullRequest.TargetBranch)"
         .bazelversion | $(Agent.OS) | "refs/heads/master"
-      path: $(Pipelines.Workspace)/bazel-out
+      path: $(Pipeline.Workspace)/bazel-out
     continueOnError: true
 
   - script: ./ci/mac_ci_setup.sh
@@ -25,7 +25,7 @@ jobs:
   - script: ./ci/mac_ci_steps.sh
     displayName: 'Run Mac CI'
     env:
-      BAZEL_STARTUP_OPTIONS: --output_base=$(Pipelines.Workspace)/bazel-out
+      BAZEL_STARTUP_OPTIONS: --output_base=$(Pipeline.Workspace)/bazel-out
       BAZEL_REMOTE_CACHE: grpcs://remotebuildexecution.googleapis.com
       BAZEL_REMOTE_INSTANCE: projects/envoy-ci/instances/default_instance
       GCP_SERVICE_ACCOUNT_KEY: $(GcpServiceAccountKey)
