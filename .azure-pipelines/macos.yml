@@ -11,13 +11,15 @@ jobs:
   steps:
   - task: CacheBeta@0
     inputs:
-      key: .bazelversion | $(Agent.OS)
+      key: .bazelversion | $(Agent.OS) | $(Build.SourceBranch) | $(Build.BuildNumber)
+      restoreKeys:
+        .bazelversion | $(Agent.OS) | $(Build.SourceBranch)
+        .bazelversion | $(Agent.OS) | $(System.PullRequest.TargetBranch)
+        .bazelversion | $(Agent.OS) | refs/heads/master
       path: $(Pipelines.Workspace)/bazel-out
-      cacheHitVar: SKIP_SETUP
 
   - script: ./ci/mac_ci_setup.sh
     displayName: 'Install dependencies'
-    condition: ne(variables.SKIP_SETUP, 'true')
 
   - script: ./ci/mac_ci_steps.sh
     displayName: 'Run Mac CI'
