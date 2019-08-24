@@ -17,6 +17,7 @@ jobs:
     env:
       BAZEL_REMOTE_CACHE: grpcs://remotebuildexecution.googleapis.com
       BAZEL_REMOTE_INSTANCE: projects/envoy-ci/instances/default_instance
+      BAZEL_BUILD_EXTRA_OPTIONS: "--announce_rc --curses=no --nodistinct_host_configuration --build_tests_only"
       GCP_SERVICE_ACCOUNT_KEY: $(GcpServiceAccountKey)
 
   - task: PublishTestResults@2
