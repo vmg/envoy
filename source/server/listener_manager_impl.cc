@@ -434,6 +434,63 @@ void ListenerImpl::setSocket(const Network::SocketSharedPtr& socket) {
   }
 }
 
+void ConnectionBalancerImpl::registerHandler(Network::BalancedConnectionHandler& handler) {
+  absl::MutexLock tag_map_lock(&tag_map_lock_);
+  auto& entry = tag_map_[handler.tag()];
+  if (entry == nullptr) {
+    entry = std::make_unique<TagEntry>();
+  }
+
+  absl::MutexLock handler_lock(&entry->handler_lock_);
+  entry->handlers_.push_back(&handler);
+}
+
+void ConnectionBalancerImpl::unregisterHandler(Network::BalancedConnectionHandler& handler) {
+  absl::MutexLock tag_map_lock(&tag_map_lock_);
+  auto entry_it = tag_map_.find(handler.tag());
+
+  bool remove_entry = false;
+  {
+    absl::MutexLock handler_lock(&entry_it->second->handler_lock_);
+    auto handler_it =
+        std::find(entry_it->second->handlers_.begin(), entry_it->second->handlers_.end(), &handler);
+    entry_it->second->handlers_.erase(handler_it);
+    if (entry_it->second->handlers_.empty()) {
+      remove_entry = true;
+    }
+  }
+
+  if (remove_entry) {
+    tag_map_.erase(entry_it);
+  }
+}
+
+Network::ConnectionBalancer::BalanceConnectionResult
+ConnectionBalancerImpl::balanceConnection(Network::ConnectionSocketPtr&& socket,
+                                          Network::BalancedConnectionHandler& current_handler) {
+  absl::ReaderMutexLock tag_map_lock(&tag_map_lock_);
+  const auto& entry = tag_map_[current_handler.tag()];
+
+  Network::BalancedConnectionHandler* min_connection_handler = nullptr;
+  {
+    absl::MutexLock handler_lock(&entry->handler_lock_);
+    for (const auto handler : entry->handlers_) {
+      if (min_connection_handler == nullptr ||
+          handler->numConnections() < min_connection_handler->numConnections()) {
+        min_connection_handler = handler;
+      }
+    }
+
+    min_connection_handler->incNumConnections();
+  }
+
+  if (min_connection_handler != &current_handler) {
+    min_connection_handler->post(std::move(socket));
+    return Network::ConnectionBalancer::BalanceConnectionResult::Rebalanced;
+  }
+  return Network::ConnectionBalancer::BalanceConnectionResult::Continue;
+}
+
 ListenerManagerImpl::ListenerManagerImpl(Instance& server,
                                          ListenerComponentFactory& listener_factory,
                                          WorkerFactory& worker_factory,
