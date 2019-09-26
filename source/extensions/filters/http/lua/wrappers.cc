@@ -121,6 +121,29 @@ int StreamInfoWrapper::luaDynamicMetadata(lua_State* state) {
   return 1;
 }
 
+int StreamInfoWrapper::luaTimings(lua_State* state) {
+  auto add_time = [](lua_State* state, const char* field,
+                     const absl::optional<std::chrono::nanoseconds>& time) {
+    if (time) {
+      std::chrono::duration<double, std::milli> ms = *time;
+      lua_pushnumber(state, ms.count());
+      lua_setfield(state, -2, field);
+    }
+  };
+
+  lua_createtable(state, 0, 8);
+  add_time(state, "lastDownstreamRxByteReceived", stream_info_.lastDownstreamRxByteReceived());
+  add_time(state, "firstUpstreamTxByteSent", stream_info_.firstUpstreamTxByteSent());
+  add_time(state, "lastUpstreamTxByteSent", stream_info_.lastUpstreamTxByteSent());
+  add_time(state, "firstUpstreamRxByteReceived", stream_info_.firstUpstreamRxByteReceived());
+  add_time(state, "lastUpstreamRxByteReceived", stream_info_.lastUpstreamRxByteReceived());
+  add_time(state, "firstDownstreamTxByteSent", stream_info_.firstDownstreamTxByteSent());
+  add_time(state, "lastDownstreamTxByteSent", stream_info_.lastDownstreamTxByteSent());
+  add_time(state, "requestComplete", stream_info_.requestComplete());
+
+  return 1;
+}
+
 DynamicMetadataMapIterator::DynamicMetadataMapIterator(DynamicMetadataMapWrapper& parent)
     : parent_{parent}, current_{parent_.streamInfo().dynamicMetadata().filter_metadata().begin()} {}
 

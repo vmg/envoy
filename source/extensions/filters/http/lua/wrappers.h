@@ -181,7 +181,9 @@ class StreamInfoWrapper : public Filters::Common::Lua::BaseLuaObject<StreamInfoW
 public:
   StreamInfoWrapper(StreamInfo::StreamInfo& stream_info) : stream_info_{stream_info} {}
   static ExportedFunctions exportedFunctions() {
-    return {{"protocol", static_luaProtocol}, {"dynamicMetadata", static_luaDynamicMetadata}};
+    return {{"protocol", static_luaProtocol},
+            {"dynamicMetadata", static_luaDynamicMetadata},
+            {"timings", static_luaTimings}};
   }
 
 private:
@@ -196,6 +198,12 @@ private:
    * @return DynamicMetadataMapWrapper representation of StreamInfo dynamic metadata.
    */
   DECLARE_LUA_FUNCTION(StreamInfoWrapper, luaDynamicMetadata);
+
+  /**
+   * Get the timing data for all phases of this stream
+   * @return table with all the known timings for this stream
+   */
+  DECLARE_LUA_FUNCTION(StreamInfoWrapper, luaTimings);
 
   // Envoy::Lua::BaseLuaObject
   void onMarkDead() override { dynamic_metadata_wrapper_.reset(); }
